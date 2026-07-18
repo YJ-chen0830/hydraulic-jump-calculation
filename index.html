@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>水躍消能計算 | Hydraulic Jump Energy Dissipation</title>
+<script src="https://yj-chen0830.github.io/jrh-core/jrh-core.js?v=3" defer></script>
+<style>
+  :root{--navy:#0b1f3a;--navy2:#13284a;--gold:#c9a14a;--gold2:#e0bf6e;--bg:#f5f3ee;--ink:#1c2530;--line:#d8d2c2;--warn:#b03a2e;--ok:#1a7d3a;}
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Noto Sans TC","Segoe UI",sans-serif;background:var(--bg);color:var(--ink);}
+  header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#f5f3ee;padding:28px 32px;}
+  header h1{margin:0;font-size:22px;}
+  header span{color:var(--gold2);font-size:13px;display:block;margin-top:4px;}
+  main{max-width:1060px;margin:0 auto;padding:28px 20px 60px;}
+  .grid{display:grid;grid-template-columns:340px 1fr;gap:24px;}
+  @media(max-width:820px){.grid{grid-template-columns:1fr;}}
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:22px 24px;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+  .card h2{font-size:14.5px;margin:0 0 18px;color:var(--navy);font-weight:700;display:flex;align-items:center;gap:8px;border-bottom:2px solid var(--gold);padding-bottom:10px;}
+  label{display:block;font-size:12px;color:#666;margin:10px 0 4px;font-weight:500;}
+  input{width:100%;padding:8px 11px;border:1.5px solid var(--line);border-radius:7px;font-size:13.5px;background:#fafaf8;}
+  input:focus{outline:none;border-color:var(--gold);}
+  .sec{font-size:12px;font-weight:700;color:var(--navy);margin:16px 0 6px;border-left:4px solid var(--gold);padding-left:9px;letter-spacing:.04em;text-transform:uppercase;}
+  .note{font-size:11.5px;color:#666;margin-top:12px;line-height:1.75;background:#f9f7f2;border-radius:6px;padding:9px 12px;}
+  .warnbox{margin-top:12px;padding:12px 14px;border:1px solid #e7b0ab;background:#fff3f1;border-radius:8px;color:var(--warn);font-size:12.5px;line-height:1.7;}
+  button.calc-btn{margin-top:16px;width:100%;padding:12px;border:none;border-radius:8px;background:var(--navy);color:#fff;font-size:14.5px;font-weight:700;cursor:pointer;}
+  button.calc-btn:hover{background:var(--navy2);}
+  button.pro-btn{margin-top:12px;width:100%;padding:12px;border:none;border-radius:8px;background:var(--gold);color:var(--navy);font-size:14.5px;font-weight:700;cursor:pointer;}
+  button.pro-btn:hover{filter:brightness(1.08);}
+  table{width:100%;border-collapse:collapse;margin-top:10px;border:1px solid var(--line);border-radius:8px;overflow:hidden;}
+  th{background:var(--navy);color:#f5f3ee;font-weight:600;font-size:12px;padding:9px 10px;text-align:left;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  td{padding:9px 10px;font-size:13px;border-bottom:1px solid var(--line);}
+  tr:nth-child(even) td{background:#f9f7f3;}
+  td:last-child{text-align:right;font-weight:700;}
+  .ok{color:var(--ok);font-weight:700;}
+  .ng{color:var(--warn);font-weight:700;}
+  details.proc{margin-top:16px;border:1px solid var(--line);border-radius:8px;background:#fafaf8;overflow:hidden;}
+  details.proc summary{cursor:pointer;padding:10px 14px;font-weight:700;font-size:13px;color:var(--navy);user-select:none;list-style:none;display:flex;align-items:center;gap:6px;}
+  details.proc summary::before{content:"▶";font-size:10px;transition:transform .2s;}
+  details[open].proc summary::before{transform:rotate(90deg);}
+  details.proc pre{margin:0;padding:12px 16px 16px;font-family:"Courier New",monospace;font-size:11.5px;line-height:1.9;white-space:pre-wrap;color:#2c3e50;border-top:1px solid var(--line);}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .proj-section{background:#fff;border:1px solid var(--gold);border-radius:10px;padding:18px 22px;margin-bottom:20px;}
+  .proj-section h3{margin:0 0 12px;color:var(--navy);font-size:14px;font-weight:700;}
+  .proj-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  @media(max-width:600px){.proj-grid{grid-template-columns:1fr;}}
+  .mob-tabs{display:none;}
+  @media screen and (max-width:767px){
+    .mob-tabs{display:flex;background:var(--bg);border-bottom:2px solid var(--line);margin:0 -20px 0;padding:0 20px;}
+    .mob-tab{flex:1;padding:11px 4px;text-align:center;font-size:13.5px;font-weight:700;color:#888;cursor:pointer;background:transparent;border:none;border-bottom:3px solid transparent;}
+    .mob-tab.active{color:var(--navy);border-bottom-color:var(--gold);}
+    .grid{display:block;}
+    .grid>.card{display:none;}
+    .grid>.card.mob-active{display:block;}
+  }
+  @media print{
+    header,.no-print{display:none!important;}
+    body{background:#fff;margin:0;font-size:9pt;line-height:1.5;color:#111;}
+    main{padding:0;max-width:100%!important;}
+    .grid{grid-template-columns:1fr!important;gap:10pt!important;}
+    .card{box-shadow:none!important;border:1px solid #ccc!important;border-radius:4pt!important;padding:10pt 12pt!important;break-inside:avoid;}
+    .card h2{font-size:10.5pt!important;padding-bottom:6pt!important;margin-bottom:9pt!important;}
+    label{font-size:8pt!important;margin:6pt 0 2pt!important;}
+    .sec{font-size:8pt!important;margin:10pt 0 4pt!important;}
+    .note,.warnbox{font-size:7.5pt!important;padding:6pt 9pt!important;}
+    table{border:1px solid #bbb!important;border-radius:0!important;margin-top:6pt!important;}
+    th{font-size:8pt!important;padding:5pt 7pt!important;background:#0b1f3a!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    td{font-size:8.5pt!important;padding:5pt 7pt!important;}
+    tr:nth-child(even) td{background:#f5f5f5!important;}
+    details.proc{display:block!important;margin-top:10pt!important;border:1pt solid #0b1f3a!important;border-radius:4pt!important;break-inside:avoid;background:#f9f9f6!important;}
+    details.proc>summary{display:none!important;}
+    details.proc::before{content:"📋  計算過程（供第三方檢核）";display:block;font-weight:700;font-size:8pt;color:#0b1f3a;padding:6pt 10pt 4pt;border-bottom:1px solid #ccc;letter-spacing:.04em;}
+    details.proc>pre{font-size:7pt!important;line-height:1.65!important;white-space:pre-wrap!important;padding:6pt 10pt 10pt!important;color:#1a1a1a!important;font-family:"Courier New",monospace!important;}
+    .proj-section{border:1.5pt solid #0b1f3a!important;border-radius:4pt!important;}
+    button.pro-btn,button.calc-btn{display:none!important;}
+    @page{margin:15mm 12mm;size:A4;}
+  }
+</style>
+</head>
+<body data-tool="hjc">
+<header>
+  <a href="https://yj-chen0830.github.io/engineering-hub/" style="color:var(--gold2);font-size:12.5px;text-decoration:none;display:inline-block;margin-bottom:8px;">← 返回工程計算中心</a>
+  <h1>💥 水躍消能計算（Froude數＋共軛水深）</h1>
+  <span>矩形斷面渠道 · Bélanger 共軛水深公式 · USBR 水躍長度概估</span>
+</header>
+<main>
+
+<div class="proj-section no-print" id="projSection">
+  <h3>📁 專案資訊（列印時帶入計算書封面）</h3>
+  <div class="proj-grid">
+    <div><label>工程名稱</label><input id="pj-name" placeholder="○○溢洪道改善工程"></div>
+    <div><label>工程地點</label><input id="pj-loc" placeholder="○○市○○區"></div>
+    <div><label>承造廠商</label><input id="pj-contractor" placeholder="○○營造股份有限公司"></div>
+    <div><label>文件編號</label><input id="pj-docno" placeholder="HJC-CAL-001"></div>
+    <div><label>計算者</label><input id="pj-calc" placeholder="姓名"></div>
+    <div><label>審核者</label><input id="pj-review" placeholder="姓名"></div>
+    <div><label>計算日期</label><input id="pj-date" type="date"></div>
+  </div>
+</div>
+
+<div class="mob-tabs">
+  <button class="mob-tab active" onclick="switchMobTab('hjc-in',this)">📋 輸入參數</button>
+  <button class="mob-tab" id="mobTab-hjc-r" onclick="switchMobTab('hjc-r',this)">📊 計算結果</button>
+</div>
+
+<div class="grid">
+  <div class="card mob-active" data-tab="hjc-in">
+    <h2>矩形渠道躍前條件</h2>
+    <div class="row2">
+      <div><label>渠道寬度 b (m)</label><input id="hjc-b" type="number" value="5" step="0.1" min="0.1"></div>
+      <div><label>躍前流量 Q (cms)</label><input id="hjc-Q" type="number" value="20" step="0.1" min="0.01"></div>
+    </div>
+    <label>躍前水深 y1 (m，急流水深)</label>
+    <input id="hjc-y1" type="number" value="0.5" step="0.01" min="0.01">
+
+    <div class="sec">適用情境</div>
+    <div class="note">適用於矩形斷面之溢洪道、陡槽、涵管出口等消能初步設計。輸入之 y1 應為躍前急流水深，通常由上游坡面或出口水力條件計算而得。若 Fr1 ≤ 1，代表不是超臨界流，本工具會提示「不會形成典型水躍」。</div>
+
+    <div class="sec">計算內容</div>
+    <div class="note">計算單位寬流量、躍前/躍後流速、Froude 數、共軛水深、水躍長度概估與能量損失，並依 Fr1 進行水躍型式分類。水躍長度採常用經驗式 Lj ≈ 6(y2-y1)。</div>
+
+    <button class="calc-btn" onclick="calcHJC()">計算水躍消能條件</button>
+  </div>
+
+  <div class="card" data-tab="hjc-r">
+    <h2>水躍計算結果</h2>
+    <div id="hjc-result"><p style="color:#888">尚未計算</p></div>
+    <details class="proc" id="hjc-proc" style="display:none">
+      <summary>📋 計算過程（供第三方檢核）</summary>
+      <pre id="hjc-proc-text"></pre>
+    </details>
+    <button class="pro-btn no-print" onclick="openPro()">📄 產出計算書 PDF</button>
+  </div>
+</div>
+
+</main>
+<script>
+function switchMobTab(name,btn){
+  btn.parentElement.querySelectorAll('.mob-tab').forEach(function(t){t.classList.remove('active');});
+  btn.classList.add('active');
+  btn.parentElement.nextElementSibling.querySelectorAll('.card').forEach(function(c){
+    c.classList.toggle('mob-active',c.dataset.tab===name);
+  });
+}
+function openPro(){JRH.checkEmail(function(){jrhPrint('水躍消能計算書');});}
+function v(id){return parseFloat(document.getElementById(id).value)||0;}
+function f2(x){return x.toFixed(2);}
+function f3(x){return x.toFixed(3);}
+function f4(x){return x.toFixed(4);}
+
+function jumpClass(fr1){
+  if(fr1 <= 1){return '非水躍條件（次臨界或臨界流）';}
+  if(fr1 < 1.7){return '波狀躍 (undular jump)';}
+  if(fr1 < 2.5){return '弱水躍 (weak jump)';}
+  if(fr1 < 4.5){return '擺動水躍 (oscillating jump)';}
+  if(fr1 <= 9.0){return '穩定水躍 (steady jump，消能效果最佳)';}
+  return '強水躍 (strong jump)';
+}
+
+function calcHJC(){
+  var b=v('hjc-b'), Q=v('hjc-Q'), y1=v('hjc-y1');
+  var g=9.81;
+  var res=document.getElementById('hjc-result');
+  var proc=document.getElementById('hjc-proc');
+  var procText=document.getElementById('hjc-proc-text');
+
+  if(b<=0||Q<=0||y1<=0){
+    res.innerHTML='<div class="warnbox">請確認 b、Q、y1 皆大於 0。</div>';
+    proc.style.display='none';
+    return;
+  }
+
+  var q=Q/b;
+  var v1=q/y1;
+  var fr1=v1/Math.sqrt(g*y1);
+  var cls=jumpClass(fr1);
+  var canJump=fr1>1;
+  var y2=canJump ? (y1/2)*(Math.sqrt(1+8*fr1*fr1)-1) : y1;
+  var v2=canJump ? q/y2 : v1;
+  var fr2=canJump ? v2/Math.sqrt(g*y2) : fr1;
+  var Lj=canJump ? 6*(y2-y1) : 0;
+  var dE=canJump ? Math.pow(y2-y1,3)/(4*y1*y2) : 0;
+
+  var warnHtml=canJump
+    ? '<div class="warnbox" style="border-color:#b8d7c0;background:#f1faf4;color:var(--ok);">Fr1 = '+f3(fr1)+' &gt; 1，屬超臨界流，可形成水躍；Fr2 = '+f3(fr2)+'，躍後已轉為次臨界流。</div>'
+    : '<div class="warnbox">Fr1 = '+f3(fr1)+' &le; 1，屬次臨界或臨界流，不會形成典型水躍；共軛水深與消能長度不具適用性，請回頭檢查上游急流條件。</div>';
+
+  res.innerHTML=
+    warnHtml+
+    '<table><tr><th>項目</th><th>數值</th></tr>'+
+    '<tr><td>單位寬度流量 q = Q/b</td><td>'+f3(q)+' m²/s</td></tr>'+
+    '<tr><td>躍前流速 v1</td><td>'+f3(v1)+' m/s</td></tr>'+
+    '<tr><td>躍前 Froude 數 Fr1</td><td>'+f3(fr1)+' '+(canJump?'<span class="ok">超臨界</span>':'<span class="ng">非超臨界</span>')+'</td></tr>'+
+    '<tr><td>水躍型式分類</td><td>'+cls+'</td></tr>'+
+    '<tr><td>共軛水深 y2</td><td>'+f3(y2)+' m</td></tr>'+
+    '<tr><td>躍後流速 v2</td><td>'+f3(v2)+' m/s</td></tr>'+
+    '<tr><td>躍後 Froude 數 Fr2</td><td>'+f3(fr2)+' '+(fr2<1?'<span class="ok">次臨界</span>':'<span class="ng">需再檢查</span>')+'</td></tr>'+
+    '<tr><td>水躍長度 Lj</td><td>'+f3(Lj)+' m</td></tr>'+
+    '<tr><td>能量損失 ΔE</td><td>'+f3(dE)+' m</td></tr>'+
+    '</table>';
+
+  var p='';
+  p+='━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+  p+='  水躍消能計算過程（矩形斷面，Bélanger 共軛水深法）\n';
+  p+='━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+  p+='【輸入】\n';
+  p+='  渠道寬度 b = '+b+' m\n';
+  p+='  躍前流量 Q = '+Q+' m³/s\n';
+  p+='  躍前水深 y1 = '+y1+' m\n';
+  p+='  重力加速度 g = 9.81 m/s²\n\n';
+  p+='【一】單位寬度流量\n';
+  p+='  q = Q / b = '+Q+' / '+b+' = '+f3(q)+' m²/s\n\n';
+  p+='【二】躍前流速\n';
+  p+='  v1 = q / y1 = '+f3(q)+' / '+y1+' = '+f3(v1)+' m/s\n\n';
+  p+='【三】躍前 Froude 數\n';
+  p+='  Fr1 = v1 / √(g×y1)\n';
+  p+='      = '+f3(v1)+' / √(9.81×'+y1+')\n';
+  p+='      = '+f3(v1)+' / '+f4(Math.sqrt(g*y1))+'\n';
+  p+='      = '+f3(fr1)+'\n';
+  p+='  判定：'+(canJump?'Fr1 > 1，超臨界流，可發生水躍':'Fr1 ≤ 1，非超臨界流，不會形成典型水躍')+'\n';
+  p+='  水躍型式：'+cls+'\n\n';
+
+  if(canJump){
+    p+='【四】共軛水深（Bélanger 方程式）\n';
+    p+='  y2 = (y1/2) × (√(1 + 8×Fr1²) - 1)\n';
+    p+='     = ('+y1+'/2) × (√(1 + 8×'+f3(fr1)+'²) - 1)\n';
+    p+='     = '+f3(y2)+' m\n\n';
+    p+='【五】躍後流速\n';
+    p+='  v2 = q / y2 = '+f3(q)+' / '+f3(y2)+' = '+f3(v2)+' m/s\n\n';
+    p+='【六】躍後 Froude 數\n';
+    p+='  Fr2 = v2 / √(g×y2)\n';
+    p+='      = '+f3(v2)+' / √(9.81×'+f3(y2)+')\n';
+    p+='      = '+f3(v2)+' / '+f4(Math.sqrt(g*y2))+'\n';
+    p+='      = '+f3(fr2)+' → '+(fr2<1?'次臨界流，驗證合理':'未降至次臨界，需檢查輸入')+'\n\n';
+    p+='【七】水躍長度概估\n';
+    p+='  Lj ≈ 6×(y2-y1) = 6×('+f3(y2)+'-'+y1+') = '+f3(Lj)+' m\n\n';
+    p+='【八】能量損失\n';
+    p+='  ΔE = (y2-y1)³ / (4×y1×y2)\n';
+    p+='     = ('+f3(y2)+'-'+y1+')³ / (4×'+y1+'×'+f3(y2)+')\n';
+    p+='     = '+f3(dE)+' m\n\n';
+  } else {
+    p+='【四】後續判讀\n';
+    p+='  因 Fr1 ≤ 1，不符合典型水躍之超臨界條件。\n';
+    p+='  共軛水深、躍後條件、跳長與能損公式在本案例不具設計意義。\n';
+  }
+
+  p+='━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+  p+='  參考：Bélanger 共軛水深公式、USBR 水工設計常用水躍長度經驗式\n';
+  p+='  限制：本工具限矩形斷面、均勻流近似與初步消能配置評估，不取代實體水工模型或 CFD/細部設計\n';
+  p+='━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━';
+
+  procText.textContent=p;
+  proc.style.display='';
+  if(window.innerWidth<768){
+    var btn=document.getElementById('mobTab-hjc-r');
+    if(btn){switchMobTab('hjc-r',btn);}
+  }
+}
+</script>
+<script>
+window.jrhDocMeta={
+  "doc":"水躍消能計算書",
+  "codes":[
+    "Open channel flow momentum equation for rectangular channels",
+    "Bélanger equation for sequent depth of hydraulic jump",
+    "USBR hydraulic jump length empirical relation Lj ≈ 6(y2-y1)"
+  ],
+  "notes":[
+    "本工具適用於矩形斷面明渠或出口急流之初步消能設計，包括溢洪道、陡槽及涵管出口。",
+    "躍前水深 y1 應由上游急流或出口控制條件先行求得；若輸入條件非超臨界流，則不應直接套用本工具結果。",
+    "共軛水深公式係依動量方程式推導，假設壓力分布近似靜水、渠道水平且斷面為矩形。",
+    "水躍長度 Lj 與能量損失 ΔE 為初步設計估算值，實際消能池長度尚應綜合尾水、護坦高程、附加塊體與沖刷條件檢討。",
+    "正式設計應由水利或水工專業技師複核，必要時進行模型試驗或數值模擬驗證。"
+  ]
+};
+</script>
+</body>
+</html>
