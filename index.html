@@ -267,6 +267,19 @@ function calcHJC(){
     if(btn){switchMobTab('hjc-r',btn);}
   }
 }
+
+/* 堰的下游常接水躍消能設施，堰流量計算的Q（cms）可直接帶入本工具的躍前
+   流量；躍前水深y1仍需使用者依實際渠槽/消能池幾何另行判斷，堰流量本身不
+   含這項資訊。 */
+function jrhTryInbound(){
+  if(!(window.JRH && JRH.showInboundBanner))return;
+  JRH.showInboundBanner('wfc','堰流量計算',function(data){
+    document.getElementById('hjc-Q').value=data.Q_cms.toFixed(3);
+    calcHJC();
+  });
+}
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',jrhTryInbound);
+else jrhTryInbound();
 </script>
 <script>
 window.jrhDocMeta={
